@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/pcarleton/grpc-starter/auth"
-	pb "github.com/pcarleton/grpc-starter/proto/api"
+	"github.com/pcarleton/cc-grpc/auth"
+	pb "github.com/pcarleton/cc-grpc/proto/api"
 	server "github.com/pcarleton/cc-grpc/server"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
