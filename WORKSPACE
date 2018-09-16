@@ -32,7 +32,6 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.5.1.tar.gz"],
 )
 
-
 load(
     "@io_bazel_rules_docker//container:container.bzl",
     "container_pull",
@@ -44,12 +43,11 @@ load(
 container_repositories()
 
 load(
-  "@io_bazel_rules_docker//go:image.bzl",
-  _go_image_repos = "repositories",
+    "@io_bazel_rules_docker//go:image.bzl",
+    _go_image_repos = "repositories",
 )
 
 _go_image_repos()
-
 
 # Imported via Gazelle
 
@@ -171,4 +169,34 @@ go_repository(
     name = "org_golang_x_text",
     commit = "f21a4dfb5e38f5895301dc265a8def02365cc3d0",
     importpath = "golang.org/x/text",
+)
+
+go_repository(
+    name = "com_github_googleapis_gax_go",
+    commit = "317e0006254c44a0ac427cc52a0e083ff0b9622f",
+    importpath = "github.com/googleapis/gax-go",
+)
+
+go_repository(
+    name = "com_google_cloud_go",
+    commit = "c728a003b238b26cef9ab6753a5dc424b331c3ad",
+    importpath = "cloud.google.com/go",
+)
+
+go_repository(
+    name = "io_opencensus_go",
+    commit = "79993219becaa7e29e3b60cb67f5b8e82dee11d6",
+    importpath = "go.opencensus.io",
+)
+
+go_repository(
+    name = "io_opencensus_go_contrib_exporter_stackdriver",
+    commit = "2b93072101d466aa4120b3c23c2e1b08af01541c",
+    importpath = "contrib.go.opencensus.io/exporter/stackdriver",
+)
+
+go_repository(
+    name = "org_golang_google_api",
+    commit = "19ff8768a5c0b8e46ea281065664787eefc24121",
+    importpath = "google.golang.org/api",
 )

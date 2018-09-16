@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cloud.google.com/go/storage"
 	"flag"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/pcarleton/cc-grpc/auth"
@@ -13,6 +14,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
+	"io/ioutil"
 	"log"
 	"net"
 	"reflect"
@@ -30,6 +32,29 @@ func init() {
 	flag.StringVar(&cert, "cert", "certs/localhost.crt", "Path to the cert file to use for TLS")
 	flag.StringVar(&key, "key", "certs/localhost.key", "TLS cert private key")
 	flag.BoolVar(&insecure, "insecure", false, "Run without TLS")
+}
+
+func readBucketContents(bucketID, object string) (string, error) {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return "", err
+	}
+	defer client.Close()
+	bucket := client.Bucket(bucketID)
+
+	rc, err := bucket.Object(object).NewReader(ctx)
+	if err != nil {
+		return "", err
+	}
+	defer rc.Close()
+
+	data, err := ioutil.ReadAll(rc)
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
 }
 
 func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -99,6 +124,8 @@ func main() {
 		}
 		grpcOptions = append(grpcOptions, grpc.Creds(creds))
 	}
+
+	log.Printf(readBucketContents("cashcoach-160218", "testkey"))
 
 	s := grpc.NewServer(grpcOptions...)
 	apiServer := server.NewServer()
