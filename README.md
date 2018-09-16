@@ -1,13 +1,8 @@
-# grpc-starter
+# Cashcoach GRPC
 
-This is a starter project that can be used to create a gRPC api server.  The features of this server are:
+This is a GRPC server for interacting with Cashcoach.  Cachcoach is a personal finance API server that helps categorize and settle up your transactions.
 
-* Authentication via Google JWT
-* Containerized
-* Bazel-enabled
-* Terraform for a micro server instance
-* TODO: Let's Encrypt support
-
+This repo is based on github.com/pcarleton/grpc-starter
 
 # Getting Started
 
