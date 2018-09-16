@@ -30,7 +30,7 @@ go_binary(
 go_image(
     name = "debug",
     embed = [":go_default_library"],
-    importpath = "github.com/pcarleton/grpc-starter/server/bin/run_server",
+    importpath = "github.com/pcarleton/cc-grpc/server/bin/run_server",
     goarch = "amd64",
     goos = "linux",
     pure = "on",
@@ -42,7 +42,7 @@ go_image(
 go_image(
     name = "prod",
     embed = [":go_default_library"],
-    importpath = "github.com/pcarleton/grpc-starter/server/bin/run_server",
+    importpath = "github.com/pcarleton/cc-grpc/server/bin/run_server",
     goarch = "amd64",
     goos = "linux",
     pure = "on",
