@@ -6,7 +6,7 @@ data "template_file" "template_file" {
   template = "${file("container-manifest.yaml")}"
   vars {
     instance_name = "${local.instance_name}"
-    project =  "${var.project}"
+    project =  "${var.project_id}"
     image_name =  "${var.image_name}"
   }
 }
