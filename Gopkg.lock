@@ -92,6 +92,12 @@
   revision = "78658fd2d1772b755720ed8c44367d11ee5380d6"
 
 [[projects]]
+  name = "github.com/pcarleton/sheets"
+  packages = ["."]
+  revision = "16c0ae2058d3f80cd4d1046a429ce64d7ad8001a"
+  version = "v0.0.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/skratchdot/open-golang"
   packages = ["open"]
@@ -130,7 +136,7 @@
 [[projects]]
   branch = "master"
   name = "google.golang.org/api"
-  packages = ["gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport/http"]
+  packages = ["drive/v3","gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","sheets/v4","storage/v1","transport/http"]
   revision = "19ff8768a5c0b8e46ea281065664787eefc24121"
 
 [[projects]]
@@ -154,6 +160,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "06dd8f42b79dc24ea93e4199d027fc17adc6599ce61d8dd6bac13b4215c140eb"
+  inputs-digest = "33c9d382ffd1f2693184b9db2209fc55467bcf2eb93a9987bbedfcce4201da49"
   solver-name = "gps-cdcl"
   solver-version = 1

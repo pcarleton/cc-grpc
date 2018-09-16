@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
+  "github.com/pcarleton/sheets"
 	"io/ioutil"
 	"log"
 	"net"
@@ -34,27 +35,39 @@ func init() {
 	flag.BoolVar(&insecure, "insecure", false, "Run without TLS")
 }
 
-func readBucketContents(bucketID, object string) (string, error) {
+func testSheetsClient() {
+  r, err := readBucketContents("cashcoach-160218", "tmp-client-secrets.json")
+  if err != nil {
+    log.Printf("Unable to read credentials: %s", err)
+    return
+  }
+
+  client, err := sheets.NewServiceAccountClient(r)
+
+  if err != nil {
+    log.Printf("Unable to create sheets client: %s", err)
+    return
+  }
+
+  files, err := client.ListFiles("")
+  if err != nil {
+    log.Printf("Error listing files: %s", err)
+    return
+  }
+
+  log.Printf(files)
+}
+
+func readBucketContents(bucketID, object string) (io.Reader, error) {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer client.Close()
 	bucket := client.Bucket(bucketID)
 
-	rc, err := bucket.Object(object).NewReader(ctx)
-	if err != nil {
-		return "", err
-	}
-	defer rc.Close()
-
-	data, err := ioutil.ReadAll(rc)
-	if err != nil {
-		return "", err
-	}
-
-	return string(data), nil
+  return rc, err
 }
 
 func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -125,7 +138,6 @@ func main() {
 		grpcOptions = append(grpcOptions, grpc.Creds(creds))
 	}
 
-	log.Printf(readBucketContents("cashcoach-160218", "testkey"))
 
 	s := grpc.NewServer(grpcOptions...)
 	apiServer := server.NewServer()

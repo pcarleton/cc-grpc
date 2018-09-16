@@ -200,3 +200,9 @@ go_repository(
     commit = "19ff8768a5c0b8e46ea281065664787eefc24121",
     importpath = "google.golang.org/api",
 )
+
+go_repository(
+    name = "com_github_pcarleton_sheets",
+    commit = "16c0ae2058d3f80cd4d1046a429ce64d7ad8001a",
+    importpath = "github.com/pcarleton/sheets",
+)
