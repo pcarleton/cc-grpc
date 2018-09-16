@@ -3,7 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "go_default_library",
     srcs = ["server.go"],
-    importpath = "github.com/pcarleton/grpc-starter/server",
+    importpath = "github.com/pcarleton/cc-grpc/server",
     visibility = ["//visibility:public"],
     deps = [
         "//proto/api:go_default_library",
