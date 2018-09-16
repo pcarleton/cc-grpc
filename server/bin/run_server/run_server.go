@@ -5,7 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/pcarleton/grpc-starter/auth"
 	pb "github.com/pcarleton/grpc-starter/proto/api"
-	server "github.com/pcarleton/grpc-starter/server"
+	server "github.com/pcarleton/cc-grpc/server"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

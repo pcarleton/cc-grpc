@@ -1,7 +1,7 @@
 package server
 
 import (
-	pb "github.com/pcarleton/grpc-starter/proto/api"
+	pb "github.com/pcarleton/cc-grpc/proto/api"
 	"golang.org/x/net/context"
 )
 
