@@ -12,7 +12,7 @@ data "template_file" "template_file" {
 }
 
 resource "google_compute_address" "api_address" {
-  name = "api-address"
+  name = "cc-api-address"
 }
 
 
