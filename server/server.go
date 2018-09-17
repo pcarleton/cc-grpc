@@ -3,6 +3,7 @@ package server
 import (
 	"cloud.google.com/go/storage"
 	pb "github.com/pcarleton/cc-grpc/proto/api"
+	"github.com/pcarleton/cc-grpc/lib"
 	"golang.org/x/net/context"
 	"github.com/pcarleton/sheets"
   "fmt"
@@ -12,11 +13,13 @@ import (
 
 type server struct {
   sheetsClient *sheets.Client
+  config *lib.Config
 }
 
 const (
   BUCKET_NAME = "cashcoach-160218"
   SHEETS_CREDS = "tmp-client-secrets.json"
+  CONFIG_YAML = "tmp-config.yaml"
 )
 
 func NewServer() pb.ApiServer {
@@ -25,8 +28,14 @@ func NewServer() pb.ApiServer {
     log.Printf("Unable to create sheets client: %s", err)
   }
 
+  config, err := getServerConfig()
+  if err != nil {
+    log.Printf("Unable to load config: %s", err)
+  }
+
 	return &server{
     sheetsClient: sheetsClient,
+    config: config,
   }
 }
 
@@ -43,9 +52,29 @@ func (s *server) CreateReport(ctx context.Context, request *pb.CreateReportReque
     log.Printf("Skipping sheets client.")
   }
 
+  email := "unset"
+  if s.config != nil {
+    email = s.config.Email
+    log.Printf("Config email: %s", s.config.Email)
+  } else {
+    log.Printf("Config is nil.")
+  }
+
 	return &pb.CreateReportResponse{
-    Result: fmt.Sprintf("Saw : %+v", *request),
+    Result: fmt.Sprintf("Saw : %+v,  email: %s", *request, email),
 	}, nil
+}
+
+func getServerConfig() (*lib.Config, error) {
+  // TODO: Don't hard code this
+	r, err := readBucketContents(BUCKET_NAME, CONFIG_YAML)
+	if err != nil {
+    return nil, fmt.Errorf("Unable to read credentials from gs://%s/%s : %s", BUCKET_NAME, SHEETS_CREDS, err)
+	}
+	defer r.Close()
+
+	config, err := lib.NewConfig(r)
+  return config, err
 }
 
 func getSheetsClient() (*sheets.Client, error) {
