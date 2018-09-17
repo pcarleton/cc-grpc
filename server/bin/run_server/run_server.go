@@ -7,6 +7,7 @@ import (
 	"github.com/pcarleton/cc-grpc/auth"
 	pb "github.com/pcarleton/cc-grpc/proto/api"
 	server "github.com/pcarleton/cc-grpc/server"
+	"github.com/pcarleton/sheets"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -14,8 +15,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
-  "github.com/pcarleton/sheets"
-	"io/ioutil"
+	"io"
 	"log"
 	"net"
 	"reflect"
@@ -36,29 +36,30 @@ func init() {
 }
 
 func testSheetsClient() {
-  r, err := readBucketContents("cashcoach-160218", "tmp-client-secrets.json")
-  if err != nil {
-    log.Printf("Unable to read credentials: %s", err)
-    return
-  }
+	r, err := readBucketContents("cashcoach-160218", "tmp-client-secrets.json")
+	if err != nil {
+		log.Printf("Unable to read credentials: %s", err)
+		return
+	}
+	defer r.Close()
 
-  client, err := sheets.NewServiceAccountClient(r)
+	client, err := sheets.NewServiceAccountClient(r)
 
-  if err != nil {
-    log.Printf("Unable to create sheets client: %s", err)
-    return
-  }
+	if err != nil {
+		log.Printf("Unable to create sheets client: %s", err)
+		return
+	}
 
-  files, err := client.ListFiles("")
-  if err != nil {
-    log.Printf("Error listing files: %s", err)
-    return
-  }
+	files, err := client.ListFiles("")
+	if err != nil {
+		log.Printf("Error listing files: %s", err)
+		return
+	}
 
-  log.Printf(files)
+	log.Printf("%+v", files)
 }
 
-func readBucketContents(bucketID, object string) (io.Reader, error) {
+func readBucketContents(bucketID, object string) (io.ReadCloser, error) {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	if err != nil {
@@ -67,7 +68,8 @@ func readBucketContents(bucketID, object string) (io.Reader, error) {
 	defer client.Close()
 	bucket := client.Bucket(bucketID)
 
-  return rc, err
+	rc, err := bucket.Object(object).NewReader(ctx)
+	return rc, err
 }
 
 func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -138,6 +140,7 @@ func main() {
 		grpcOptions = append(grpcOptions, grpc.Creds(creds))
 	}
 
+	testSheetsClient()
 
 	s := grpc.NewServer(grpcOptions...)
 	apiServer := server.NewServer()
