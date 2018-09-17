@@ -37,10 +37,14 @@ func (s *server) GetHealth(ctx context.Context, request *pb.GetHealthRequest) (*
 }
 
 func (s *server) CreateReport(ctx context.Context, request *pb.CreateReportRequest) (*pb.CreateReportResponse, error) {
-  s.testSheetsClient()
+  if s.sheetsClient != nil {
+    s.testSheetsClient()
+  } else {
+    log.Printf("Skipping sheets client.")
+  }
 
 	return &pb.CreateReportResponse{
-		Result: "HI",
+    Result: fmt.Sprintf("Saw : %+v", *request),
 	}, nil
 }
 

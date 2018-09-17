@@ -20,6 +20,10 @@ message GetHealthResponse {
 }
 
 message CreateReportRequest {
+  int32 month = 1;
+  string namespace = 2;
+  string account_id = 3;
+  string spreadsheet_id = 4;
 }
 
 message CreateReportResponse {
