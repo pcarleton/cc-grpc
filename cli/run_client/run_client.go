@@ -103,11 +103,11 @@ func main() {
 	log.Printf("Health status: %s", r.Status)
 
 	r2, err := c.CreateReport(ctx, &pb.CreateReportRequest{
-    Month: 8,
-    Namespace: "paul",
-    AccountId: "amazon",
-    SpreadsheetId: "abcdefg",
-  })
+		Month:         8,
+		Namespace:     "paul",
+		AccountId:     "amazon",
+		SpreadsheetId: "abcdefg",
+	})
 	if err != nil {
 		log.Fatalf("could not create report: %s", err)
 	}
