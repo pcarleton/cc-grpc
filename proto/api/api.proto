@@ -4,6 +4,7 @@ package api;
 
 service Api {
   rpc GetHealth(GetHealthRequest) returns (GetHealthResponse) {}
+  rpc CreateReport(CreateReportRequest) returns (CreateReportResponse) {}
 }
 
 message GetHealthRequest {
