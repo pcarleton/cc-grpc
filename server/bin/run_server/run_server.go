@@ -1,13 +1,11 @@
 package main
 
 import (
-	"cloud.google.com/go/storage"
 	"flag"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/pcarleton/cc-grpc/auth"
 	pb "github.com/pcarleton/cc-grpc/proto/api"
 	server "github.com/pcarleton/cc-grpc/server"
-	"github.com/pcarleton/sheets"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -15,7 +13,6 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
-	"io"
 	"log"
 	"net"
 	"reflect"
@@ -33,43 +30,6 @@ func init() {
 	flag.StringVar(&cert, "cert", "certs/localhost.crt", "Path to the cert file to use for TLS")
 	flag.StringVar(&key, "key", "certs/localhost.key", "TLS cert private key")
 	flag.BoolVar(&insecure, "insecure", false, "Run without TLS")
-}
-
-func testSheetsClient() {
-	r, err := readBucketContents("cashcoach-160218", "tmp-client-secrets.json")
-	if err != nil {
-		log.Printf("Unable to read credentials: %s", err)
-		return
-	}
-	defer r.Close()
-
-	client, err := sheets.NewServiceAccountClient(r)
-
-	if err != nil {
-		log.Printf("Unable to create sheets client: %s", err)
-		return
-	}
-
-	files, err := client.ListFiles("")
-	if err != nil {
-		log.Printf("Error listing files: %s", err)
-		return
-	}
-
-	log.Printf("%+v", files)
-}
-
-func readBucketContents(bucketID, object string) (io.ReadCloser, error) {
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer client.Close()
-	bucket := client.Bucket(bucketID)
-
-	rc, err := bucket.Object(object).NewReader(ctx)
-	return rc, err
 }
 
 func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -139,8 +99,6 @@ func main() {
 		}
 		grpcOptions = append(grpcOptions, grpc.Creds(creds))
 	}
-
-	testSheetsClient()
 
 	s := grpc.NewServer(grpcOptions...)
 	apiServer := server.NewServer()

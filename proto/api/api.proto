@@ -19,3 +19,12 @@ message GetHealthResponse {
   // NEXT =  2
 }
 
+message CreateReportRequest {
+}
+
+message CreateReportResponse {
+  string result = 1;
+  // NEXT =  2
+}
+
+
