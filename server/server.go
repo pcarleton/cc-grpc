@@ -4,6 +4,7 @@ import (
 	"cloud.google.com/go/storage"
 	"fmt"
 	"github.com/pcarleton/cc-grpc/lib"
+	"github.com/pcarleton/cc-grpc/report"
 	pb "github.com/pcarleton/cc-grpc/proto/api"
 	"github.com/pcarleton/sheets"
 	"golang.org/x/net/context"
@@ -60,8 +61,39 @@ func (s *server) CreateReport(ctx context.Context, request *pb.CreateReportReque
 		log.Printf("Config is nil.")
 	}
 
+  // TODO: Don't hard code this
+		startDays := map[string]int{
+			"sapphire": 6,
+			"amazon": 9,
+			"freedom": 18,
+			"reserve": 8,
+		}
+
+		startDay := startDays[request.AccountId]
+
+		statement, err := report.GetStatement(s.config, int(request.Month), report.StatementDesc{
+			request.Namespace,
+			request.AccountId,
+			startDay,
+		})
+
+    if err != nil {
+	     return &pb.CreateReportResponse{
+         Result: fmt.Sprintf("Saw : %+v,  email: %s, error: %s ", *request, email, err),
+	     }, nil
+    }
+
+		sheet, err := report.UploadStatement(s.sheetsClient, statement, request.SpreadsheetId)
+    if err != nil {
+	     return &pb.CreateReportResponse{
+         Result: fmt.Sprintf("Saw : %+v,  email: %s, error: %s ", *request, email, err),
+	     }, nil
+    }
+
+
+    link := fmt.Sprintf("Report visible at: %s\n", sheet.Spreadsheet.Url())
 	return &pb.CreateReportResponse{
-		Result: fmt.Sprintf("Saw : %+v,  email: %s", *request, email),
+    Result: fmt.Sprintf("Saw : %+v,  email: %s, result: %s", *request, email, link),
 	}, nil
 }
 
