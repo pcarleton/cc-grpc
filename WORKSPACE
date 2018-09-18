@@ -212,3 +212,81 @@ go_repository(
     commit = "5420a8b6744d3b0345ab293f6fcba19c978f1183",
     importpath = "gopkg.in/yaml.v2",
 )
+
+go_repository(
+    name = "com_github_fsnotify_fsnotify",
+    commit = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9",
+    importpath = "github.com/fsnotify/fsnotify",
+)
+
+go_repository(
+    name = "com_github_hashicorp_hcl",
+    commit = "8cb6e5b959231cc1119e43259c4a608f9c51a241",
+    importpath = "github.com/hashicorp/hcl",
+)
+
+go_repository(
+    name = "com_github_inconshreveable_mousetrap",
+    commit = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
+    importpath = "github.com/inconshreveable/mousetrap",
+)
+
+go_repository(
+    name = "com_github_magiconair_properties",
+    commit = "c2353362d570a7bfa228149c62842019201cfb71",
+    importpath = "github.com/magiconair/properties",
+)
+
+go_repository(
+    name = "com_github_mitchellh_go_homedir",
+    commit = "ae18d6b8b3205b561c79e8e5f69bff09736185f4",
+    importpath = "github.com/mitchellh/go-homedir",
+)
+
+go_repository(
+    name = "com_github_mitchellh_mapstructure",
+    commit = "fa473d140ef3c6adf42d6b391fe76707f1f243c8",
+    importpath = "github.com/mitchellh/mapstructure",
+)
+
+go_repository(
+    name = "com_github_pelletier_go_toml",
+    commit = "c01d1270ff3e442a8a57cddc1c92dc1138598194",
+    importpath = "github.com/pelletier/go-toml",
+)
+
+go_repository(
+    name = "com_github_spf13_afero",
+    commit = "d40851caa0d747393da1ffb28f7f9d8b4eeffebd",
+    importpath = "github.com/spf13/afero",
+)
+
+go_repository(
+    name = "com_github_spf13_cast",
+    commit = "8965335b8c7107321228e3e3702cab9832751bac",
+    importpath = "github.com/spf13/cast",
+)
+
+go_repository(
+    name = "com_github_spf13_cobra",
+    commit = "ef82de70bb3f60c65fb8eebacbb2d122ef517385",
+    importpath = "github.com/spf13/cobra",
+)
+
+go_repository(
+    name = "com_github_spf13_jwalterweatherman",
+    commit = "4a4406e478ca629068e7768fc33f3f044173c0a6",
+    importpath = "github.com/spf13/jwalterweatherman",
+)
+
+go_repository(
+    name = "com_github_spf13_pflag",
+    commit = "9a97c102cda95a86cec2345a6f09f55a939babf5",
+    importpath = "github.com/spf13/pflag",
+)
+
+go_repository(
+    name = "com_github_spf13_viper",
+    commit = "8fb642006536c8d3760c99d4fa2389f5e2205631",
+    importpath = "github.com/spf13/viper",
+)
