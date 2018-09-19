@@ -15,9 +15,14 @@ enum HealthStatus {
   OK = 1;
 }
 
+message HealthCheckResponse {
+  string label = 1;
+  HealthStatus status = 2;
+  string result = 3;
+}
+
 message GetHealthResponse {
-  HealthStatus status = 1;
-  // NEXT =  2
+  repeated HealthCheckResponse statuses = 1;
 }
 
 message CreateReportRequest {

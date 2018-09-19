@@ -2,6 +2,7 @@ package server
 
 import (
 	"cloud.google.com/go/storage"
+
 	"fmt"
 	"github.com/pcarleton/cc-grpc/lib"
 	"github.com/pcarleton/cc-grpc/report"
@@ -14,7 +15,9 @@ import (
 
 type server struct {
 	sheetsClient *sheets.Client
+  sheetsClientError error
 	config       *lib.Config
+  configError error
 }
 
 const (
@@ -28,21 +31,43 @@ func NewServer() pb.ApiServer {
 	if err != nil {
 		log.Printf("Unable to create sheets client: %s", err)
 	}
+  scError := err
 
 	config, err := getServerConfig()
 	if err != nil {
 		log.Printf("Unable to load config: %s", err)
 	}
+  configErr := err
 
 	return &server{
 		sheetsClient: sheetsClient,
+    sheetsClientError: scError,
 		config:       config,
+    configError: configErr,
 	}
 }
 
+func healthCheckErr(label string, err error) *pb.HealthCheckResponse {
+  if err == nil {
+    return &pb.HealthCheckResponse{
+      Label: label,
+      Status: pb.HealthStatus_OK,
+    }
+  }
+  return &pb.HealthCheckResponse{
+    Label: label,
+    Status: pb.HealthStatus_UNHEALTHY,
+    Result: fmt.Sprintf("Error: %s", err),
+  }
+}
+
 func (s *server) GetHealth(ctx context.Context, request *pb.GetHealthRequest) (*pb.GetHealthResponse, error) {
+  log.Printf("Got health request: %+v", *request)
 	return &pb.GetHealthResponse{
-		Status: pb.HealthStatus_OK,
+	  Statuses: []*pb.HealthCheckResponse{
+      healthCheckErr("Config", s.configError),
+      healthCheckErr("Google Sheets", s.sheetsClientError),
+    },
 	}, nil
 }
 
@@ -102,7 +127,7 @@ func getServerConfig() (*lib.Config, error) {
 	// TODO: Don't hard code this
 	r, err := readBucketContents(BUCKET_NAME, CONFIG_YAML)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to read credentials from gs://%s/%s : %s", BUCKET_NAME, SHEETS_CREDS, err)
+		return nil, fmt.Errorf("Unable to read credentials from gs://%s/%s : %s", BUCKET_NAME, CONFIG_YAML, err)
 	}
 	defer r.Close()
 

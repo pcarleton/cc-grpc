@@ -178,6 +178,27 @@ var reportCmd = &cobra.Command{
 	},
 }
 
+// healthCmd represents the health command
+var healthCmd = &cobra.Command{
+	Use:   "health",
+	Short: "Print the health of the server",
+	Long:  `TODO`,
+	Run: func(cmd *cobra.Command, args []string) {
+		client := getClient()
+		ctx := client.GetContext()
+
+		resp, err := client.apiClient.GetHealth(ctx, &pb.GetHealthRequest{})
+		if err != nil {
+      log.Fatalf("could not fetch health: %s", err)
+		}
+    for _, check := range resp.Statuses {
+      log.Printf("Health Response: %s [%s] %s", check.Label, check.Status, check.Result)
+    }
+  },
+}
+
+
 func init() {
 	RootCmd.AddCommand(reportCmd)
+	RootCmd.AddCommand(healthCmd)
 }

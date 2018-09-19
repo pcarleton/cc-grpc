@@ -15,7 +15,6 @@ import (
 	"google.golang.org/grpc/status"
 	"log"
 	"net"
-	"reflect"
 )
 
 const (
@@ -43,25 +42,13 @@ func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
 
 	token, err := auth.VerifyGoogleJwt(meta["token"][0])
 	if err != nil {
-		log.Printf("Error: %s", err)
-		log.Printf("Token: %s", meta["token"][0])
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
-
-	log.Printf("%+v", token)
 
 	if err = token.Claims.Valid(); err != nil {
 		log.Printf("Error: %s", err)
 		return nil, status.Errorf(codes.Unauthenticated, "invalid claims")
 
-	}
-
-	ctype := reflect.TypeOf(token.Claims)
-	log.Printf("Claims type: %v", ctype)
-	log.Printf("Claims path: %v", ctype.PkgPath())
-
-	for i := 0; i < ctype.NumMethod(); i++ {
-		log.Printf("Method %i : %v", i, ctype.Method(i).PkgPath)
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
@@ -71,10 +58,17 @@ func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
 		return nil, status.Errorf(codes.Unauthenticated, "uncastable claims")
 	}
 	email, ok := claims["email"].(string)
-	name, ok := claims["name"].(string)
 
-	log.Printf(email)
-	log.Printf(name)
+  // TODO: Don't hardcode valid users
+  if email != "paulcarletonjr@gmail.com" {
+		log.Printf("Unknown email: %s", email)
+		return nil, status.Errorf(codes.Unauthenticated, "unknown email")
+
+  }
+	//name, ok := claims["name"].(string)
+
+	//log.Printf(email)
+	//log.Printf(name)
 
 	return handler(ctx, req)
 }
