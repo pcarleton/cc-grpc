@@ -61,12 +61,29 @@ func healthCheckErr(label string, err error) *pb.HealthCheckResponse {
   }
 }
 
+func (s *server) testPlaidConnectivity() error {
+  if s.config == nil {
+    return fmt.Errorf("No config present.")
+  }
+  client := s.config.GetClient()
+
+  acctName := "paul"
+  acct := s.config.GetAccount(acctName)
+  if acct == nil {
+    return fmt.Errorf("No account found for: %s", acctName)
+  }
+
+  _, err := client.RetrieveBalance(acct.Token)
+  return err
+}
+
 func (s *server) GetHealth(ctx context.Context, request *pb.GetHealthRequest) (*pb.GetHealthResponse, error) {
   log.Printf("Got health request: %+v", *request)
 	return &pb.GetHealthResponse{
 	  Statuses: []*pb.HealthCheckResponse{
       healthCheckErr("Config", s.configError),
       healthCheckErr("Google Sheets", s.sheetsClientError),
+      healthCheckErr("Plaid", s.testPlaidConnectivity()),
     },
 	}, nil
 }
