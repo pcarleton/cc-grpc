@@ -78,15 +78,16 @@ func (s *server) CreateReport(ctx context.Context, request *pb.CreateReportReque
 		})
 
     if err != nil {
+
 	     return &pb.CreateReportResponse{
-         Result: fmt.Sprintf("Saw : %+v,  email: %s, error: %s ", *request, email, err),
+         Result: fmt.Sprintf("Saw : %+v,  email: %s, error getting statement: %s ", *request, email, err),
 	     }, nil
     }
 
 		sheet, err := report.UploadStatement(s.sheetsClient, statement, request.SpreadsheetId)
     if err != nil {
 	     return &pb.CreateReportResponse{
-         Result: fmt.Sprintf("Saw : %+v,  email: %s, error: %s ", *request, email, err),
+         Result: fmt.Sprintf("Saw : %+v,  email: %s, error uploading statement: %s ", *request, email, err),
 	     }, nil
     }
 
