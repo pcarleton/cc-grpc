@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/pcarleton/cc-grpc/auth"
+	"github.com/pcarleton/cc-grpc/buildinfo"
 	pb "github.com/pcarleton/cc-grpc/proto/api"
 	server "github.com/pcarleton/cc-grpc/server"
 	"golang.org/x/net/context"
@@ -59,12 +60,12 @@ func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
 	}
 	email, ok := claims["email"].(string)
 
-  // TODO: Don't hardcode valid users
-  if email != "paulcarletonjr@gmail.com" {
+	// TODO: Don't hardcode valid users
+	if email != "paulcarletonjr@gmail.com" {
 		log.Printf("Unknown email: %s", email)
 		return nil, status.Errorf(codes.Unauthenticated, "unknown email")
 
-  }
+	}
 	//name, ok := claims["name"].(string)
 
 	//log.Printf(email)
@@ -75,6 +76,7 @@ func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
 
 func main() {
 	flag.Parse()
+	log.Printf("Running version: %s", buildinfo.GitCommitID())
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

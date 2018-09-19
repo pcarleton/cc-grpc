@@ -1,4 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 load("@bazel_gazelle//:def.bzl", "gazelle")
 
 # gazelle:prefix github.com/pcarleton/cc-grpc
 gazelle(name = "gazelle")
+
+# gazelle:exclude buildinfo.go
+go_library(
+    name = "buildinfo",
+    srcs = ["buildinfo.go"],
+    importpath = "github.com/pcarleton/cc-grpc/buildinfo",
+    visibility = ["//:__subpackages__"],
+    x_defs = {
+        "_GIT_COMMIT_ID": "{STABLE_GIT_COMMIT_ID}",
+    },
+)

@@ -7,6 +7,7 @@ go_library(
     importpath = "github.com/pcarleton/cc-grpc/server/bin/run_server",
     visibility = ["//visibility:private"],
     deps = [
+        "//:buildinfo",
         "//auth:go_default_library",
         "//proto/api:go_default_library",
         "//server:go_default_library",

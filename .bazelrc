@@ -1,0 +1,1 @@
+build --workspace_status_command=build/bazel_workspace_status --stamp=yes
