@@ -6,6 +6,7 @@ go_library(
     importpath = "github.com/pcarleton/cc-grpc/server",
     visibility = ["//visibility:public"],
     deps = [
+        "//:buildinfo",
         "//lib:go_default_library",
         "//proto/api:go_default_library",
         "//report:go_default_library",

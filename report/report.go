@@ -1,12 +1,12 @@
 package report
 
 import (
-	"time"
-	"github.com/pcarleton/cc-grpc/lib"
-	"strings"
 	"fmt"
+	"github.com/pcarleton/cc-grpc/lib"
 	"github.com/pcarleton/sheets"
 	gsheets "google.golang.org/api/sheets/v4"
+	"strings"
+	"time"
 )
 
 // Steps
@@ -29,7 +29,6 @@ import (
 // Start date
 // End date
 
-
 // [Label] -> [Transaction] -> [Statement] -> [Sheet]
 
 // Trigger:
@@ -44,8 +43,8 @@ import (
 
 type StatementDesc struct {
 	PlaidLabel string // Nickname for plaid API key, corresponds to a login with a finandical institution
-	Account string // Nickname for the account e.g. sapphire
-	StartDay int
+	Account    string // Nickname for the account e.g. sapphire
+	StartDay   int
 }
 
 // Pink : 255, 164, 164
@@ -55,35 +54,35 @@ type StatementDesc struct {
 // TODO: there's gotta be a better way
 func getPink() *gsheets.Color {
 	return &gsheets.Color{
-		Alpha:           1.0,
-		Red:             1.0,
-		Green:           0.639,
-		Blue:            0.639,
+		Alpha: 1.0,
+		Red:   1.0,
+		Green: 0.639,
+		Blue:  0.639,
 	}
 }
 
 func getBlue() *gsheets.Color {
 	return &gsheets.Color{
-		Alpha:           1.0,
-		Red:             0.298,
-		Green:           0.631,
-		Blue:            0.631,
+		Alpha: 1.0,
+		Red:   0.298,
+		Green: 0.631,
+		Blue:  0.631,
 	}
 }
 
 func getGreen() *gsheets.Color {
 	return &gsheets.Color{
-		Alpha:           1.0,
-		Red:             0.565,
-		Green:           0.78,
-		Blue:            0.137,
+		Alpha: 1.0,
+		Red:   0.565,
+		Green: 0.78,
+		Blue:  0.137,
 	}
 }
 
 func (sd *StatementDesc) GetInterval(targetMonth time.Month) (start, end time.Time) {
 	targetYear := 2018
 	// Subtract a second so when we ask if a date is "after" this date, it is true
-	start = time.Date(targetYear, time.Month(targetMonth - 1), sd.StartDay, 0, 0, 0, 0, time.Local).Add(-1*time.Second)
+	start = time.Date(targetYear, time.Month(targetMonth-1), sd.StartDay, 0, 0, 0, 0, time.Local).Add(-1 * time.Second)
 	// We end on the statement date + a month, and then later exclude anything that happens after this time
 	// so it ends up being 1 day before.  For instance, all transactions on the 18th through and including the 17th
 	// of the next month, but not anything on the 18th.
@@ -101,14 +100,13 @@ func (s *Statement) MatchRange(trans lib.TransactionRow) bool {
 }
 
 type Statement struct {
-	Desc StatementDesc
+	Desc         StatementDesc
 	Transactions lib.TransactionTable
-	Start time.Time
-	End time.Time
-	Payment lib.TransactionRow
-	Due float64
+	Start        time.Time
+	End          time.Time
+	Payment      lib.TransactionRow
+	Due          float64
 }
-
 
 func isPayment(trans lib.TransactionRow) bool {
 	if strings.Contains(trans.Description, "Payment") {
@@ -125,7 +123,6 @@ func GetStatement(c *lib.Config, targetMonth int, desc StatementDesc) (*Statemen
 	// Add some buffer at the end to try to pick up the payment transaction
 	// TODO: Make this optional
 	bufferEnd := end.AddDate(0, 0, 7)
-
 
 	ttable, err := c.TransactionsForRange(desc.PlaidLabel, start, bufferEnd)
 	if err != nil {
@@ -163,22 +160,21 @@ func formattingRule(word string, color *gsheets.Color, column int64, sheetId int
 	return &gsheets.ConditionalFormatRule{
 		BooleanRule: &gsheets.BooleanRule{
 			Condition: &gsheets.BooleanCondition{
-				Type:            "TEXT_CONTAINS",
-				Values:          []*gsheets.ConditionValue{{UserEnteredValue: word}},
+				Type:   "TEXT_CONTAINS",
+				Values: []*gsheets.ConditionValue{{UserEnteredValue: word}},
 			},
 			Format: &gsheets.CellFormat{
 				BackgroundColor: color,
 			},
 		},
-		Ranges:          []*gsheets.GridRange{{StartColumnIndex:column, EndColumnIndex: column+2, SheetId: sheetId}},
+		Ranges: []*gsheets.GridRange{{StartColumnIndex: column, EndColumnIndex: column + 2, SheetId: sheetId}},
 	}
 }
-
 
 func UploadStatement(client *sheets.Client, statement *Statement, spreadsheetId string) (*sheets.Sheet, error) {
 	ss, err := client.GetSpreadsheet(spreadsheetId)
 	if err != nil {
-	    return nil, err
+		return nil, err
 	}
 
 	tdata := statement.Transactions.ToDataArr()
@@ -190,11 +186,11 @@ func UploadStatement(client *sheets.Client, statement *Statement, spreadsheetId 
 	if sheet == nil {
 		sheet, err = ss.AddSheet(sheetTitle)
 		if err != nil {
-		    return nil, err
+			return nil, err
 		}
 	}
 
-	startingPos := sheets.CellPos{Row:0, Col: 3}
+	startingPos := sheets.CellPos{Row: 0, Col: 3}
 	sheet.UpdateFromPosition(tdata, startingPos)
 
 	// TODO: this is very specific... pass in as a template
@@ -202,9 +198,9 @@ func UploadStatement(client *sheets.Client, statement *Statement, spreadsheetId 
 		{"total", "=SUM(H2:H)"},
 		{"", ""},
 		{"for", ""},
-		{"both",      "=SUMIF(I$2:I,\"=\"&A4,H$2:H)"},
-		{"paul",      "=SUMIF(I$2:I,\"=\"&A5,H$2:H)"},
-		{"taylor",    "=SUMIF(I$2:I,\"=\"&A6,H$2:H)"},
+		{"both", "=SUMIF(I$2:I,\"=\"&A4,H$2:H)"},
+		{"paul", "=SUMIF(I$2:I,\"=\"&A5,H$2:H)"},
+		{"taylor", "=SUMIF(I$2:I,\"=\"&A6,H$2:H)"},
 		{"splitwise", "=SUMIF(I$2:I,\"=\"&A7,H$2:H)"},
 	}
 
@@ -246,17 +242,17 @@ func UploadStatement(client *sheets.Client, statement *Statement, spreadsheetId 
 		Properties: &gsheets.SheetProperties{
 			SheetId: sheetId,
 			GridProperties: &gsheets.GridProperties{
-				FrozenRowCount:    1,
+				FrozenRowCount: 1,
 			},
 		},
 	}
 
-	reqs = append(reqs, &gsheets.Request{UpdateSheetProperties:freezeRowReq})
+	reqs = append(reqs, &gsheets.Request{UpdateSheetProperties: freezeRowReq})
 
 	_, err = sheet.Spreadsheet.DoBatch(reqs...)
 
 	if err != nil {
-	    return nil, err
+		return nil, err
 	}
 
 	return sheet, nil

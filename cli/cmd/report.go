@@ -189,14 +189,14 @@ var healthCmd = &cobra.Command{
 
 		resp, err := client.apiClient.GetHealth(ctx, &pb.GetHealthRequest{})
 		if err != nil {
-      log.Fatalf("could not fetch health: %s", err)
+			log.Fatalf("could not fetch health: %s", err)
 		}
-    for _, check := range resp.Statuses {
-      log.Printf("Health Response: %s [%s] %s", check.Label, check.Status, check.Result)
-    }
-  },
+		log.Printf("Version: %s", resp.Version)
+		for _, check := range resp.Statuses {
+			log.Printf("Health Response: %s [%s] %s", check.Label, check.Status, check.Result)
+		}
+	},
 }
-
 
 func init() {
 	RootCmd.AddCommand(reportCmd)

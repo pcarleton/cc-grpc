@@ -22,7 +22,8 @@ message HealthCheckResponse {
 }
 
 message GetHealthResponse {
-  repeated HealthCheckResponse statuses = 1;
+  string version = 1;
+  repeated HealthCheckResponse statuses = 2;
 }
 
 message CreateReportRequest {

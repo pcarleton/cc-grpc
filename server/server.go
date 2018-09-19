@@ -4,9 +4,10 @@ import (
 	"cloud.google.com/go/storage"
 
 	"fmt"
+	"github.com/pcarleton/cc-grpc/buildinfo"
 	"github.com/pcarleton/cc-grpc/lib"
-	"github.com/pcarleton/cc-grpc/report"
 	pb "github.com/pcarleton/cc-grpc/proto/api"
+	"github.com/pcarleton/cc-grpc/report"
 	"github.com/pcarleton/sheets"
 	"golang.org/x/net/context"
 	"io"
@@ -14,10 +15,10 @@ import (
 )
 
 type server struct {
-	sheetsClient *sheets.Client
-  sheetsClientError error
-	config       *lib.Config
-  configError error
+	sheetsClient      *sheets.Client
+	sheetsClientError error
+	config            *lib.Config
+	configError       error
 }
 
 const (
@@ -31,64 +32,65 @@ func NewServer() pb.ApiServer {
 	if err != nil {
 		log.Printf("Unable to create sheets client: %s", err)
 	}
-  scError := err
+	scError := err
 
 	config, err := getServerConfig()
 	if err != nil {
 		log.Printf("Unable to load config: %s", err)
 	}
-  configErr := err
+	configErr := err
 
 	return &server{
-		sheetsClient: sheetsClient,
-    sheetsClientError: scError,
-		config:       config,
-    configError: configErr,
+		sheetsClient:      sheetsClient,
+		sheetsClientError: scError,
+		config:            config,
+		configError:       configErr,
 	}
 }
 
 func healthCheckErr(label string, err error) *pb.HealthCheckResponse {
-  if err == nil {
-    return &pb.HealthCheckResponse{
-      Label: label,
-      Status: pb.HealthStatus_OK,
-    }
-  }
-  return &pb.HealthCheckResponse{
-    Label: label,
-    Status: pb.HealthStatus_UNHEALTHY,
-    Result: fmt.Sprintf("Error: %s", err),
-  }
+	if err == nil {
+		return &pb.HealthCheckResponse{
+			Label:  label,
+			Status: pb.HealthStatus_OK,
+		}
+	}
+	return &pb.HealthCheckResponse{
+		Label:  label,
+		Status: pb.HealthStatus_UNHEALTHY,
+		Result: fmt.Sprintf("Error: %s", err),
+	}
 }
 
 func (s *server) testPlaidConnectivity() error {
-  if s.config == nil {
-    return fmt.Errorf("No config present.")
-  }
+	if s.config == nil {
+		return fmt.Errorf("No config present.")
+	}
 
-  if s.config.ClientId == "" || s.config.ClientSecret == "" {
-    return fmt.Errorf("Empty fields in config.")
-  }
-  client := s.config.GetClient()
+	if s.config.ClientId == "" || s.config.ClientSecret == "" {
+		return fmt.Errorf("Empty fields in config.")
+	}
+	client := s.config.GetClient()
 
-  acctName := "paul"
-  acct := s.config.GetAccount(acctName)
-  if acct == nil {
-    return fmt.Errorf("No account found for: %s", acctName)
-  }
+	acctName := "paul"
+	acct := s.config.GetAccount(acctName)
+	if acct == nil {
+		return fmt.Errorf("No account found for: %s", acctName)
+	}
 
-  _, err := client.RetrieveBalance(acct.Token)
-  return err
+	_, err := client.RetrieveBalance(acct.Token)
+	return err
 }
 
 func (s *server) GetHealth(ctx context.Context, request *pb.GetHealthRequest) (*pb.GetHealthResponse, error) {
-  log.Printf("Got health request: %+v", *request)
+	log.Printf("Got health request: %+v", *request)
 	return &pb.GetHealthResponse{
-	  Statuses: []*pb.HealthCheckResponse{
-      healthCheckErr("Config", s.configError),
-      healthCheckErr("Google Sheets", s.sheetsClientError),
-      healthCheckErr("Plaid", s.testPlaidConnectivity()),
-    },
+		Version: buildinfo.GitCommitID(),
+		Statuses: []*pb.HealthCheckResponse{
+			healthCheckErr("Config", s.configError),
+			healthCheckErr("Google Sheets", s.sheetsClientError),
+			healthCheckErr("Plaid", s.testPlaidConnectivity()),
+		},
 	}, nil
 }
 
@@ -107,40 +109,39 @@ func (s *server) CreateReport(ctx context.Context, request *pb.CreateReportReque
 		log.Printf("Config is nil.")
 	}
 
-  // TODO: Don't hard code this
-		startDays := map[string]int{
-			"sapphire": 6,
-			"amazon": 9,
-			"freedom": 18,
-			"reserve": 8,
-		}
+	// TODO: Don't hard code this
+	startDays := map[string]int{
+		"sapphire": 6,
+		"amazon":   9,
+		"freedom":  18,
+		"reserve":  8,
+	}
 
-		startDay := startDays[request.AccountId]
+	startDay := startDays[request.AccountId]
 
-		statement, err := report.GetStatement(s.config, int(request.Month), report.StatementDesc{
-			request.Namespace,
-			request.AccountId,
-			startDay,
-		})
+	statement, err := report.GetStatement(s.config, int(request.Month), report.StatementDesc{
+		request.Namespace,
+		request.AccountId,
+		startDay,
+	})
 
-    if err != nil {
+	if err != nil {
 
-	     return &pb.CreateReportResponse{
-         Result: fmt.Sprintf("Saw : %+v,  email: %s, error getting statement: %s ", *request, email, err),
-	     }, nil
-    }
+		return &pb.CreateReportResponse{
+			Result: fmt.Sprintf("Saw : %+v,  email: %s, error getting statement: %s ", *request, email, err),
+		}, nil
+	}
 
-		sheet, err := report.UploadStatement(s.sheetsClient, statement, request.SpreadsheetId)
-    if err != nil {
-	     return &pb.CreateReportResponse{
-         Result: fmt.Sprintf("Saw : %+v,  email: %s, error uploading statement: %s ", *request, email, err),
-	     }, nil
-    }
+	sheet, err := report.UploadStatement(s.sheetsClient, statement, request.SpreadsheetId)
+	if err != nil {
+		return &pb.CreateReportResponse{
+			Result: fmt.Sprintf("Saw : %+v,  email: %s, error uploading statement: %s ", *request, email, err),
+		}, nil
+	}
 
-
-    link := fmt.Sprintf("Report visible at: %s\n", sheet.Spreadsheet.Url())
+	link := fmt.Sprintf("Report visible at: %s\n", sheet.Spreadsheet.Url())
 	return &pb.CreateReportResponse{
-    Result: fmt.Sprintf("Saw : %+v,  email: %s, result: %s", *request, email, link),
+		Result: fmt.Sprintf("Saw : %+v,  email: %s, result: %s", *request, email, link),
 	}, nil
 }
 
