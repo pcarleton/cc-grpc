@@ -20,10 +20,10 @@ const (
 
 type Config struct {
 	Email        string `yaml:"email"`
-	ClientId     string `yaml:"client_id`
-	ClientSecret string `yaml:"client_secret`
+	ClientId     string `yaml:"client_id"`
+	ClientSecret string `yaml:"client_secret"`
 	// The list of accounts should be stored not in this struct
-	Accounts []Account `yaml:"accounts`
+	Accounts []Account `yaml:"accounts"`
 }
 
 func NewConfig(reader io.Reader) (*Config, error) {

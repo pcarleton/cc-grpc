@@ -65,6 +65,10 @@ func (s *server) testPlaidConnectivity() error {
   if s.config == nil {
     return fmt.Errorf("No config present.")
   }
+
+  if s.config.ClientId == "" || s.config.ClientSecret == "" {
+    return fmt.Errorf("Empty fields in config.")
+  }
   client := s.config.GetClient()
 
   acctName := "paul"
