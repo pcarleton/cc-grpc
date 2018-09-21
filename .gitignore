@@ -1,2 +1,3 @@
 bazel-*
 envvars.sh
+*.swp
