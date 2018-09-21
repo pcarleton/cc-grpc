@@ -13,7 +13,7 @@ class App extends Component {
 
   responseGoogle(response) {
     console.log(response);
-    alert(Client.getHealth(response.idToken));
+    console.log(Client.getHealth(response.tokenId));
   }
 
   loginPage() {
