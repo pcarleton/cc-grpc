@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/pcarleton/cc-grpc/auth"
 	"github.com/pcarleton/cc-grpc/buildinfo"
 	pb "github.com/pcarleton/cc-grpc/proto/api"
@@ -16,6 +17,7 @@ import (
 	"google.golang.org/grpc/status"
 	"log"
 	"net"
+	"net/http"
 )
 
 const (
@@ -99,10 +101,21 @@ func main() {
 	s := grpc.NewServer(grpcOptions...)
 	apiServer := server.NewServer()
 	pb.RegisterApiServer(s, apiServer)
+
+	wrappedGrpc := grpcweb.WrapServer(s)
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 	log.Printf("Starting server on %s", port)
-	if err := s.Serve(lis); err != nil {
+	server := buildServer(wrappedGrpc)
+	if err := server.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
+	}
+}
+
+func buildServer(wrappedGrpc *grpcweb.WrappedGrpcServer) *http.Server {
+	return &http.Server{
+		Handler: http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
+			wrappedGrpc.ServeHTTP(resp, req)
+		}),
 	}
 }

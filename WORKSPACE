@@ -290,3 +290,21 @@ go_repository(
     commit = "8fb642006536c8d3760c99d4fa2389f5e2205631",
     importpath = "github.com/spf13/viper",
 )
+
+go_repository(
+    name = "com_github_gorilla_websocket",
+    commit = "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d",
+    importpath = "github.com/gorilla/websocket",
+)
+
+go_repository(
+    name = "com_github_improbable_eng_grpc_web",
+    commit = "8bc2a4d43363d03ea6cfbd3db96e4a5458bfbfc7",
+    importpath = "github.com/improbable-eng/grpc-web",
+)
+
+go_repository(
+    name = "com_github_rs_cors",
+    commit = "3fb1b69b103a84de38a19c3c6ec073dd6caa4d3f",
+    importpath = "github.com/rs/cors",
+)

@@ -68,10 +68,22 @@
   version = "v1.1.1"
 
 [[projects]]
+  name = "github.com/gorilla/websocket"
+  packages = ["."]
+  revision = "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d"
+  version = "v1.4.0"
+
+[[projects]]
   name = "github.com/hashicorp/hcl"
   packages = [".","hcl/ast","hcl/parser","hcl/printer","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
   revision = "8cb6e5b959231cc1119e43259c4a608f9c51a241"
   version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/improbable-eng/grpc-web"
+  packages = ["go/grpcweb"]
+  revision = "8bc2a4d43363d03ea6cfbd3db96e4a5458bfbfc7"
+  version = "0.6.3"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -138,6 +150,12 @@
   packages = ["."]
   revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
   version = "v1.2.0"
+
+[[projects]]
+  name = "github.com/rs/cors"
+  packages = ["."]
+  revision = "3fb1b69b103a84de38a19c3c6ec073dd6caa4d3f"
+  version = "v1.5.0"
 
 [[projects]]
   branch = "master"
@@ -244,6 +262,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0713f9a7d5d5b5f8d37ed4eda837447420fc5b530046ccc6425f3bedded5e027"
+  inputs-digest = "3dffbeec6e1f8325412a78307c0683874ce3fc7166f8d8e5032467a2099dbede"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -9,7 +9,7 @@ function getHealth(idToken: string) {
   const getHealthRequest = new GetHealthRequest();
   grpc.unary(Api.GetHealth, {
     request: getHealthRequest,
-    host: "http://localhost:8080",
+    host: "http://cc.pcarleton.com:5001",
     metadata: new grpc.Metadata({"token": idToken}),
     onEnd: res => {
       const {status, statusMessage, headers, message, trailers } = res;
